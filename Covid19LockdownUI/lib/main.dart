@@ -44,10 +44,10 @@ class _DashboardPage extends State<DashboardPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await loadCovid19ZATimeline(
-          await parseJsonFromUrl('http://0.0.0.0:7071/api/GetCovidTimeline'));
+      await loadCovid19ZATimeline(await parseJsonFromUrl(
+          'https://covidlockdownalert.azurewebsites.net/api/GetCovidTimeline'));
       await loadProvincialCumulativeTimeline(await parseJsonFromUrl(
-          'http://0.0.0.0:7071/api/GetProvincialCumulativeTimeline'));
+          'https://covidlockdownalert.azurewebsites.net/api/GetProvincialCumulativeTimeline'));
 
       setState(() {});
     });
@@ -125,10 +125,7 @@ class CasesOverviewPage extends StatelessWidget {
 
   Widget _buildUserRow(BuildContext context) {
     return <Widget>[
-      Icon(Icons.public)
-          .decorated(
-            borderRadius: BorderRadius.circular(30),
-          )
+      Icon(Icons.public).iconSize(50).iconColor(Colors.white)
           .constrained(height: 50, width: 50)
           .padding(right: 10),
       <Widget>[
