@@ -22,7 +22,7 @@ namespace Lumii.GetCovid19ZATimelineTests
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            string csv = GetCSV("https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_timeline_testing.csv");
+            string csv = GetData("https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_timeline_testing.csv");
 
             StringBuilder stringBuilderCsv = new StringBuilder();
             stringBuilderCsv.Append(csv);
@@ -44,7 +44,7 @@ namespace Lumii.GetCovid19ZATimelineTests
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            string csv = GetCSV("https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv");
+            string csv = GetData("https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv");
 
             StringBuilder stringBuilderCsv = new StringBuilder();
             stringBuilderCsv.Append(csv);
@@ -60,7 +60,43 @@ namespace Lumii.GetCovid19ZATimelineTests
             return new OkObjectResult(json);
         }
 
-        private static string GetCSV(string url)
+        [FunctionName("GetRegulation")]
+        public static async Task<IActionResult> GetRegulation(
+               [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
+               ILogger log)
+        {
+            log.LogInformation("C# HTTP trigger function processed a request.");
+
+            string json = GetData("https://raw.githubusercontent.com/GeorgeLekala/ZACovid19Lockdown/master/data/regulation.json");
+
+            return new OkObjectResult(json);
+        }
+
+        [FunctionName("GetRegulationRule")]
+        public static async Task<IActionResult> GetRegulationRule(
+               [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
+               ILogger log)
+        {
+            log.LogInformation("C# HTTP trigger function processed a request.");
+
+            string json = GetData("https://raw.githubusercontent.com/GeorgeLekala/ZACovid19Lockdown/master/data/regulationrule.json");
+
+            return new OkObjectResult(json);
+        }
+
+        [FunctionName("GetSuburb")]
+        public static async Task<IActionResult> GetSuburb(
+               [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
+               ILogger log)
+        {
+            log.LogInformation("C# HTTP trigger function processed a request.");
+
+            string json = GetData("https://raw.githubusercontent.com/GeorgeLekala/ZACovid19Lockdown/master/data/subplacelokuptable.json");
+
+            return new OkObjectResult(json);
+        }
+
+        private static string GetData(string url)
         {
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
             HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
