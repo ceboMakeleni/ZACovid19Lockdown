@@ -1,0 +1,94 @@
+{
+    "Regulation": [
+        {
+            "Id": 1,
+            "RestrictionName": "Agriculture, hunting, forestry and fishing",
+            "RestrictionIcon": "Agriculture"
+        },
+        {
+            "Id": 2,
+            "RestrictionName": "Electricity, gas and water supply",
+            "RestrictionIcon": "Electricity"
+        },
+        {
+            "Id": 3,
+            "RestrictionName": "Manufacturing",
+            "RestrictionIcon": "Manufacturing"
+        },
+        {
+            "Id": 4,
+            "RestrictionName": "Construction and related services (inc. tradespeople)",
+            "RestrictionIcon": "Construction"
+        },
+        {
+            "Id": 5,
+            "RestrictionName": "Wholesale and retail trade, covering stores, spaza shops, eCommerce and informal traders",
+            "RestrictionIcon": "Wholesale"
+        },
+        {
+            "Id": 6,
+            "RestrictionName": "Information and communication services",
+            "RestrictionIcon": "Information"
+        },
+        {
+            "Id": 7,
+            "RestrictionName": "Media and entertainment services",
+            "RestrictionIcon": "Media"
+        },
+        {
+            "Id": 8,
+            "RestrictionName": "Financial and business services",
+            "RestrictionIcon": "Financial"
+        },
+        {
+            "Id": 9,
+            "RestrictionName": "Accommodation and food service activities",
+            "RestrictionIcon": "Accommodation"
+        },
+        {
+            "Id": 10,
+            "RestrictionName": "Transport, storage and communication services",
+            "RestrictionIcon": "Transport"
+        },
+        {
+            "Id": 11,
+            "RestrictionName": "Mining and quarrying:",
+            "RestrictionIcon": "Mining"
+        },
+        {
+            "Id": 12,
+            "RestrictionName": "Repair and related emergency services",
+            "RestrictionIcon": "Repair"
+        },
+        {
+            "Id": 13,
+            "RestrictionName": "Supply chains",
+            "RestrictionIcon": "Supply"
+        },
+        {
+            "Id": 14,
+            "RestrictionName": "Private households employment",
+            "RestrictionIcon": "Domestic"
+        },
+        {
+            "Id": 15,
+            "RestrictionName": "Public administration, government services and other arms of the state",
+            "RestrictionIcon": "Public"
+        },
+        {
+            "Id": 16,
+            "RestrictionName": "Health, social and personal services",
+            "RestrictionIcon": "Health"
+        },
+        {
+            "Id": 17,
+            "RestrictionName": "Education services",
+            "RestrictionIcon": "Education"
+        },
+        {
+            "Id": 18,
+            "RestrictionName": "Personal Movement",
+            "RestrictionIcon": "Movement"
+        }
+    ]
+}
