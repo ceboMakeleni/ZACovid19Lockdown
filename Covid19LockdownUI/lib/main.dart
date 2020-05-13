@@ -5,7 +5,6 @@ import 'package:CovidLockdownAlert/models/regulation.dart';
 import 'package:CovidLockdownAlert/models/regulationrule.dart';
 import 'package:CovidLockdownAlert/models/subplacelookup.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:random_color/random_color.dart';
 import 'package:styled_widget/styled_widget.dart';
@@ -14,9 +13,10 @@ import 'package:flare_splash_screen/flare_splash_screen.dart';
 void main() => runApp(RootAppPage());
 
 List<SettingsItemModel> suburbItems = [];
-List<SubPlaceLookup> litems = [];
 List<Covid19ZATimeline> lCovid19ZATimeline = [];
 List<ProvincialCumulativeTimeline> lProvincialCumulativeTimeline = [];
+List<SubPlaceLookup> lSubPlaceLookup = [];
+
 RandomColor randColor = RandomColor();
 
 class RootAppPage extends StatelessWidget {
@@ -102,7 +102,8 @@ class _DashboardPage extends State<DashboardPage> {
           onPressed: () async {
             var result = await _navigateAndDisplaySelection(context);
             if (result != null) {
-              var exist = litems.any((e) => e.suburbCode == result.suburbCode);
+              var exist =
+                  lSubPlaceLookup.any((e) => e.suburbCode == result.suburbCode);
               if (!exist) {
                 setState(() {
                   suburbItems.add(SettingsItemModel(
@@ -133,7 +134,9 @@ class CasesOverviewPage extends StatelessWidget {
 
   Widget _buildUserRow(BuildContext context) {
     return <Widget>[
-      Icon(Icons.public).iconSize(50).iconColor(Colors.white)
+      Icon(Icons.public)
+          .iconSize(50)
+          .iconColor(Colors.white)
           .constrained(height: 50, width: 50)
           .padding(right: 10),
       <Widget>[
@@ -349,10 +352,11 @@ class _SearchListState extends State<SearchList> {
   );
   final key = new GlobalKey<ScaffoldState>();
   final TextEditingController _searchQuery = new TextEditingController();
-  List<SubPlaceLookup> _list = [];
 
   bool _IsSearching;
   String _searchText = "";
+  List<SubPlaceLookup> litems = [];
+
 
   _SearchListState() {
     _searchQuery.addListener(() {
@@ -375,19 +379,20 @@ class _SearchListState extends State<SearchList> {
     super.initState();
     _IsSearching = false;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      Map<String, dynamic> dmap =
-          await parseJsonFromAssets('assets/data/subplacelokuptable.json');
+      if (litems.isEmpty) {
+        Map<String, dynamic> dmap = await parseJsonFromUrl(
+            'https://covidlockdownalert.azurewebsites.net/api/GetSuburb');
 
-      var spLookup = SubPlace.fromJson(dmap);
-      _list = spLookup.subPlaceLookup;
-      setState(() {});
+        var spLookup = SubPlace.fromJson(dmap);
+        litems = spLookup.subPlaceLookup;
+        setState(() {});
+      }
     });
   }
 
-  Future<Map<String, dynamic>> parseJsonFromAssets(String assetsPath) async {
-    return rootBundle
-        .loadString(assetsPath)
-        .then((jsonStr) => jsonDecode(jsonStr));
+  Future<dynamic> parseJsonFromUrl(String url) async {
+    Response response = await get(url);
+    return jsonDecode(response.body);
   }
 
   @override
@@ -403,16 +408,16 @@ class _SearchListState extends State<SearchList> {
   }
 
   List<ChildItem> _buildList() {
-    return _list.map((contact) => new ChildItem(contact)).toList();
+    return litems.map((contact) => new ChildItem(contact)).toList();
   }
 
   List<ChildItem> _buildSearchList() {
     if (_searchText.isEmpty) {
-      return _list.map((contact) => new ChildItem(contact)).toList();
+      return litems.map((contact) => new ChildItem(contact)).toList();
     } else {
       List<SubPlaceLookup> _searchList = List();
-      for (int i = 0; i < _list.length; i++) {
-        SubPlaceLookup subPlaceLookup = _list.elementAt(i);
+      for (int i = 0; i < litems.length; i++) {
+        SubPlaceLookup subPlaceLookup = litems.elementAt(i);
         if (subPlaceLookup.suburbName
             .toLowerCase()
             .contains(_searchText.toLowerCase())) {
@@ -510,20 +515,21 @@ class _RegulationsStateState extends State<_RegulationsState> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      Map<String, dynamic> dmap =
-          await parseJsonFromAssets('assets/data/regulation.json');
+      if (regulations.isEmpty) {
+        Map<String, dynamic> dmap = await parseJsonFromUrl(
+            'https://covidlockdownalert.azurewebsites.net/api/GetRegulation');
 
-      var regulationMap = RegulationLookup.fromJson(dmap);
-      setState(() {
-        regulations = regulationMap.regulation;
-      });
+        var regulationMap = RegulationLookup.fromJson(dmap);
+        setState(() {
+          regulations = regulationMap.regulation;
+        });
+      }
     });
   }
 
-  Future<Map<String, dynamic>> parseJsonFromAssets(String assetsPath) async {
-    return rootBundle
-        .loadString(assetsPath)
-        .then((jsonStr) => jsonDecode(jsonStr));
+  Future<dynamic> parseJsonFromUrl(String url) async {
+    Response response = await get(url);
+    return jsonDecode(response.body);
   }
 
   @override
@@ -620,28 +626,30 @@ class _RegulationsRuleStateState extends State<_RegulationRulesState> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      Map<String, dynamic> dmap =
-          await parseJsonFromAssets('assets/data/regulationrule.json');
+      if (regulationRules.isEmpty) {
+        Map<String, dynamic> dmap = await parseJsonFromUrl(
+            'https://covidlockdownalert.azurewebsites.net/api/GetRegulationRule');
 
-      var regulationRuleMap = RegulationRulesLookup.fromJson(dmap);
-      setState(() {
-        final tempList = regulationRuleMap.regulationRule;
+        var regulationRuleMap = RegulationRulesLookup.fromJson(dmap);
+        setState(() {
+          final tempList = regulationRuleMap.regulationRule;
 
-        final regulationRuleList = tempList
-            .where((item) =>
-                item.regulationRuleLevel == selectedSubPlaceLookupItem.level &&
-                item.regulationId == selectedRegulationItem.id)
-            .toList();
+          final regulationRuleList = tempList
+              .where((item) =>
+                  item.regulationRuleLevel ==
+                      selectedSubPlaceLookupItem.level &&
+                  item.regulationId == selectedRegulationItem.id)
+              .toList();
 
-        regulationRules = regulationRuleList.first.regulationRules.toList();
-      });
+          regulationRules = regulationRuleList.first.regulationRules.toList();
+        });
+      }
     });
   }
 
-  Future<Map<String, dynamic>> parseJsonFromAssets(String assetsPath) async {
-    return rootBundle
-        .loadString(assetsPath)
-        .then((jsonStr) => jsonDecode(jsonStr));
+  Future<dynamic> parseJsonFromUrl(String url) async {
+    Response response = await get(url);
+    return jsonDecode(response.body);
   }
 
   @override
