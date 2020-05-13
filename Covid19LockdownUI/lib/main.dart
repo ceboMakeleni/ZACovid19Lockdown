@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:random_color/random_color.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:flare_splash_screen/flare_splash_screen.dart';
 
 void main() => runApp(RootAppPage());
 
@@ -26,7 +27,14 @@ class RootAppPage extends StatelessWidget {
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: ThemeMode.system,
-      home: DashboardPage(),
+      home: SplashScreen.navigate(
+        name: 'assets/flares/Loading.flr',
+        next: (context) => DashboardPage(),
+        until: () => Future.delayed(Duration(seconds: 5)),
+        startAnimation: 'Alarm',
+        fit: BoxFit.scaleDown,
+        backgroundColor: Colors.black54,
+        ),
       debugShowCheckedModeBanner: false,
     );
   }
