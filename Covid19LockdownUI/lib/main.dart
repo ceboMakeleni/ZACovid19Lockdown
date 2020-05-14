@@ -256,6 +256,18 @@ class _SuburbPage extends State<SuburbPage> {
                     content: Text(
                         "${settingsItem.subPlaceLookup.suburbName} dismissed")));
               },
+              background: Container(
+                child: Icon(Icons.delete_forever, size: 40),
+                color: Colors.red,
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.only(left: 50.0),
+              ),
+              secondaryBackground: Container(
+                child: Icon(Icons.delete_forever, size: 40),
+                color: Colors.red,
+                alignment: Alignment.centerRight,
+                padding: EdgeInsets.only(right: 50.0),
+              ),
               child: SuburbItem(settingsItem.subPlaceLookup, settingsItem.icon,
                   settingsItem.color));
         })
