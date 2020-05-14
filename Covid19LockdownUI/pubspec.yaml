@@ -1,6 +1,5 @@
-name: CovidLockdownAlert
-description: A new Flutter project.
-
+name: VulaVala
+description: A South African Lockdown Information Tracker
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -23,13 +22,18 @@ environment:
 dependencies:
   http: ^0.12.0+2
   random_color: ^1.0.5
-  flutter_icons: ^1.1.0
   styled_widget: ^0.2.1+2
   search_widget: ^1.0.2
   flare_splash_screen: ^3.0.1
+  flutter_launcher_icons: ^0.7.3
   flutter:
     sdk: flutter
   google_maps_flutter: ^0.5.11
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/icon.png"
 
 
   # The following adds the Cupertino Icons font to your application.

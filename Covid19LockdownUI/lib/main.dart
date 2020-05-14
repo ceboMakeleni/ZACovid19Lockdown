@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:CovidLockdownAlert/models/covid19zatimeline.dart';
-import 'package:CovidLockdownAlert/models/regulation.dart';
-import 'package:CovidLockdownAlert/models/regulationrule.dart';
-import 'package:CovidLockdownAlert/models/subplacelookup.dart';
+import 'models/regulation.dart';
+import 'models/covid19zatimeline.dart';
+import 'models/regulationrule.dart';
+import 'models/subplacelookup.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:random_color/random_color.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:flare_splash_screen/flare_splash_screen.dart';
+
 
 void main() => runApp(RootAppPage());
 
@@ -38,13 +39,13 @@ class RootAppPage extends StatelessWidget {
               Duration(seconds: 5),
               () async => {
                     await loadCovid19ZATimeline(await parseJsonFromUrl(
-                        'https://covidlockdownalert.azurewebsites.net/api/GetCovidTimeline')),
+                        'https://VulaVala.azurewebsites.net/api/GetCovidTimeline')),
                     await loadProvincialCumulativeTimeline(await parseJsonFromUrl(
-                        'https://covidlockdownalert.azurewebsites.net/api/GetProvincialCumulativeTimeline')),
+                        'https://VulaVala.azurewebsites.net/api/GetProvincialCumulativeTimeline')),
                     await loadSubPlaceLookups(await parseJsonFromUrl(
-                        'https://covidlockdownalert.azurewebsites.net/api/GetSuburb')),
+                        'https://VulaVala.azurewebsites.net/api/GetSuburb')),
                     await loadRegulationLookups(await parseJsonFromUrl(
-                        'https://covidlockdownalert.azurewebsites.net/api/GetRegulation'))
+                        'https://VulaVala.azurewebsites.net/api/GetRegulation'))
                   }),
           startAnimation: '0',
           loopAnimation: 'Untitled',
@@ -626,7 +627,7 @@ class _RegulationsRuleStateState extends State<_RegulationRulesState> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (regulationRulesLookup.isEmpty) {
         Map<String, dynamic> dmap = await parseJsonFromUrl(
-            'https://covidlockdownalert.azurewebsites.net/api/GetRegulationRule');
+            'https://VulaVala.azurewebsites.net/api/GetRegulationRule');
 
         var regulationRuleMap = RegulationRulesLookup.fromJson(dmap);
         regulationRulesLookup = regulationRuleMap.regulationRule;

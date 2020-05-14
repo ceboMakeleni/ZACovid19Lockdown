@@ -1,6 +1,6 @@
 {
-    "name": "CovidLockdownAlert",
-    "short_name": "CovidLockdownAlert",
+    "name": "VulaVala",
+    "short_name": "VulaVala",
     "start_url": ".",
     "display": "minimal-ui",
     "background_color": "#0175C2",

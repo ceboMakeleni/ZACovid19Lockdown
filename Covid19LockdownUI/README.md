@@ -1,4 +1,4 @@
-# CovidLockdownAlert
+# VulaVala
 
 A new Flutter project.
 
