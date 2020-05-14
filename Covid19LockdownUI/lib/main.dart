@@ -32,10 +32,10 @@ class RootAppPage extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       themeMode: ThemeMode.system,
       home: SplashScreen.navigate(
-          name: 'assets/flares/Loading.flr',
+          name: 'assets/flares/LiquidLoader.flr',
           next: (context) => DashboardPage(),
           until: () => Future.delayed(
-              Duration(seconds: 10),
+              Duration(seconds: 5),
               () async => {
                     await loadCovid19ZATimeline(await parseJsonFromUrl(
                         'https://covidlockdownalert.azurewebsites.net/api/GetCovidTimeline')),
@@ -46,9 +46,10 @@ class RootAppPage extends StatelessWidget {
                     await loadRegulationLookups(await parseJsonFromUrl(
                         'https://covidlockdownalert.azurewebsites.net/api/GetRegulation'))
                   }),
-          startAnimation: 'Alarm',
+          startAnimation: '0',
+          loopAnimation: 'Untitled',
           fit: BoxFit.scaleDown,
-          backgroundColor: Colors.white),
+          backgroundColor: Colors.black),
       debugShowCheckedModeBanner: false,
     );
   }
