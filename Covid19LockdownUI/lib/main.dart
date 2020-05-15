@@ -1,14 +1,16 @@
+import 'dart:async';
 import 'dart:convert';
 
-import 'package:CovidLockdownAlert/models/covid19zatimeline.dart';
-import 'package:CovidLockdownAlert/models/regulation.dart';
-import 'package:CovidLockdownAlert/models/regulationrule.dart';
-import 'package:CovidLockdownAlert/models/subplacelookup.dart';
+import 'models/regulation.dart';
+import 'models/covid19zatimeline.dart';
+import 'models/regulationrule.dart';
+import 'models/subplacelookup.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:random_color/random_color.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:flare_splash_screen/flare_splash_screen.dart';
+
 
 void main() => runApp(RootAppPage());
 
@@ -16,6 +18,9 @@ List<SettingsItemModel> suburbItems = [];
 List<Covid19ZATimeline> lCovid19ZATimeline = [];
 List<ProvincialCumulativeTimeline> lProvincialCumulativeTimeline = [];
 List<SubPlaceLookup> lSubPlaceLookup = [];
+List<SubPlaceLookup> loadSubPlaceLookup = [];
+List<Regulation> regulationsLookup = [];
+List<RegulationRule> regulationRulesLookup = [];
 
 RandomColor randColor = RandomColor();
 
@@ -28,42 +33,41 @@ class RootAppPage extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       themeMode: ThemeMode.system,
       home: SplashScreen.navigate(
-        name: 'assets/flares/Loading.flr',
-        next: (context) => DashboardPage(),
-        until: () => Future.delayed(Duration(seconds: 5)),
-        startAnimation: 'Alarm',
-        fit: BoxFit.scaleDown,
-        backgroundColor: Colors.black54,
-        ),
+          name: 'assets/flares/LiquidLoader.flr',
+          next: (context) => DashboardPage(),
+          until: () => Future.delayed(
+              Duration(seconds: 5),
+              () async => {
+                    await loadCovid19ZATimeline(await parseJsonFromUrl(
+                        'https://VulaVala.azurewebsites.net/api/GetCovidTimeline')),
+                    await loadProvincialCumulativeTimeline(await parseJsonFromUrl(
+                        'https://VulaVala.azurewebsites.net/api/GetProvincialCumulativeTimeline')),
+                    await loadSubPlaceLookups(await parseJsonFromUrl(
+                        'https://VulaVala.azurewebsites.net/api/GetSuburb')),
+                    await loadRegulationLookups(await parseJsonFromUrl(
+                        'https://VulaVala.azurewebsites.net/api/GetRegulation'))
+                  }),
+          startAnimation: '0',
+          loopAnimation: 'Untitled',
+          fit: BoxFit.scaleDown,
+          backgroundColor: Colors.black),
       debugShowCheckedModeBanner: false,
     );
-  }
-}
-
-class DashboardPage extends StatefulWidget {
-  DashboardPage({Key key}) : super(key: key);
-
-  @override
-  _DashboardPage createState() => _DashboardPage();
-}
-
-class _DashboardPage extends State<DashboardPage> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await loadCovid19ZATimeline(await parseJsonFromUrl(
-          'https://covidlockdownalert.azurewebsites.net/api/GetCovidTimeline'));
-      await loadProvincialCumulativeTimeline(await parseJsonFromUrl(
-          'https://covidlockdownalert.azurewebsites.net/api/GetProvincialCumulativeTimeline'));
-
-      setState(() {});
-    });
   }
 
   Future<dynamic> parseJsonFromUrl(String url) async {
     Response response = await get(url);
     return jsonDecode(response.body);
+  }
+
+  Future<void> loadRegulationLookups(dynamic dmap) async {
+    var regulationMap = RegulationLookup.fromJson(dmap);
+    regulationsLookup = regulationMap.regulation;
+  }
+
+  Future<void> loadSubPlaceLookups(dynamic dmap) async {
+    var spLookup = SubPlace.fromJson(dmap);
+    loadSubPlaceLookup = spLookup.subPlaceLookup;
   }
 
   Future<void> loadCovid19ZATimeline(dynamic dmap) async {
@@ -79,6 +83,23 @@ class _DashboardPage extends State<DashboardPage> {
           ProvincialCumulativeTimeline.fromJson(e);
       lProvincialCumulativeTimeline.add(provincialCumulativeTimeline);
     }
+  }
+}
+
+class DashboardPage extends StatefulWidget {
+  DashboardPage({Key key}) : super(key: key);
+
+  @override
+  _DashboardPage createState() => _DashboardPage();
+}
+
+class _DashboardPage extends State<DashboardPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      setState(() {});
+    });
   }
 
   @override
@@ -367,8 +388,6 @@ class _SearchListState extends State<SearchList> {
 
   bool _IsSearching;
   String _searchText = "";
-  List<SubPlaceLookup> litems = [];
-
 
   _SearchListState() {
     _searchQuery.addListener(() {
@@ -391,14 +410,7 @@ class _SearchListState extends State<SearchList> {
     super.initState();
     _IsSearching = false;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (litems.isEmpty) {
-        Map<String, dynamic> dmap = await parseJsonFromUrl(
-            'https://covidlockdownalert.azurewebsites.net/api/GetSuburb');
-
-        var spLookup = SubPlace.fromJson(dmap);
-        litems = spLookup.subPlaceLookup;
-        setState(() {});
-      }
+      setState(() {});
     });
   }
 
@@ -420,16 +432,18 @@ class _SearchListState extends State<SearchList> {
   }
 
   List<ChildItem> _buildList() {
-    return litems.map((contact) => new ChildItem(contact)).toList();
+    return loadSubPlaceLookup.map((contact) => new ChildItem(contact)).toList();
   }
 
   List<ChildItem> _buildSearchList() {
     if (_searchText.isEmpty) {
-      return litems.map((contact) => new ChildItem(contact)).toList();
+      return loadSubPlaceLookup
+          .map((contact) => new ChildItem(contact))
+          .toList();
     } else {
       List<SubPlaceLookup> _searchList = List();
-      for (int i = 0; i < litems.length; i++) {
-        SubPlaceLookup subPlaceLookup = litems.elementAt(i);
+      for (int i = 0; i < loadSubPlaceLookup.length; i++) {
+        SubPlaceLookup subPlaceLookup = loadSubPlaceLookup.elementAt(i);
         if (subPlaceLookup.suburbName
             .toLowerCase()
             .contains(_searchText.toLowerCase())) {
@@ -521,27 +535,12 @@ class _RegulationsStateState extends State<_RegulationsState> {
   final SubPlaceLookup selectedItem;
   _RegulationsStateState(this.selectedItem);
 
-  List<Regulation> regulations = [];
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (regulations.isEmpty) {
-        Map<String, dynamic> dmap = await parseJsonFromUrl(
-            'https://covidlockdownalert.azurewebsites.net/api/GetRegulation');
-
-        var regulationMap = RegulationLookup.fromJson(dmap);
-        setState(() {
-          regulations = regulationMap.regulation;
-        });
-      }
+      setState(() {});
     });
-  }
-
-  Future<dynamic> parseJsonFromUrl(String url) async {
-    Response response = await get(url);
-    return jsonDecode(response.body);
   }
 
   @override
@@ -558,9 +557,9 @@ class _RegulationsStateState extends State<_RegulationsState> {
           children: <Widget>[
             new Expanded(
                 child: new ListView.builder(
-                    itemCount: regulations.length,
+                    itemCount: regulationsLookup.length,
                     itemBuilder: (BuildContext context, int index) {
-                      final item = regulations[index];
+                      final item = regulationsLookup[index];
                       return Container(
                         key: Key(item.id.toString()),
                         child: ListTile(
@@ -638,25 +637,31 @@ class _RegulationsRuleStateState extends State<_RegulationRulesState> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (regulationRules.isEmpty) {
+      if (regulationRulesLookup.isEmpty) {
         Map<String, dynamic> dmap = await parseJsonFromUrl(
-            'https://covidlockdownalert.azurewebsites.net/api/GetRegulationRule');
+            'https://VulaVala.azurewebsites.net/api/GetRegulationRule');
 
         var regulationRuleMap = RegulationRulesLookup.fromJson(dmap);
+        regulationRulesLookup = regulationRuleMap.regulationRule;
         setState(() {
-          final tempList = regulationRuleMap.regulationRule;
-
-          final regulationRuleList = tempList
-              .where((item) =>
-                  item.regulationRuleLevel ==
-                      selectedSubPlaceLookupItem.level &&
-                  item.regulationId == selectedRegulationItem.id)
-              .toList();
-
-          regulationRules = regulationRuleList.first.regulationRules.toList();
+          filterRegulationRules();
+        });
+      } else {
+        setState(() {
+          filterRegulationRules();
         });
       }
     });
+  }
+
+  void filterRegulationRules() {
+    final regulationRuleList = regulationRulesLookup
+        .where((item) =>
+            item.regulationRuleLevel == selectedSubPlaceLookupItem.level &&
+            item.regulationId == selectedRegulationItem.id)
+        .toList();
+
+    regulationRules = regulationRuleList.first.regulationRules.toList();
   }
 
   Future<dynamic> parseJsonFromUrl(String url) async {
